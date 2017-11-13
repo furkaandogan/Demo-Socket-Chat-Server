@@ -1,12 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "umd",
-    "outDir": "./build",
-    "noImplicitAny": true
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "./publish/linux",
+    "mapRoot": "./src",
+    "sourceMap": true,
+    "sourceRoot": "./src",
+    "watch": true
   },
   "include": [
     "./src/**/*.ts"
   ],
-  "exclude": []
+  "exclude": [
+    "node_modules"
+  ]
 }

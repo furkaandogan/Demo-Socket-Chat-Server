@@ -1,0 +1,12 @@
+version: '2'
+services:
+  server:
+    container_name: dh-chat-server
+    #command: nodemon --debug=5859
+    image: dh-chat:test
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5858:5858
+      - 5859:5859

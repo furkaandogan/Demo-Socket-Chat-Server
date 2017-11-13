@@ -1,15 +1,9 @@
-import * as express from "express";
-import * as http from "http";
-import { IApp } from "./IApp";
-import { ChatApp } from "./chat/ChatApp";
-
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const http = require("http");
+const ChatApp_1 = require("./chat/ChatApp");
 class Startup {
-    private static Self: Startup;
-    private IApp: IApp;
-    private ExpressApp: Express.Application;
-
-    constructor(app: IApp) {
+    constructor(app) {
         this.IApp = app;
         this.IApp.Server = http.createServer(function (req, res) {
             res.write("dh chat app");
@@ -20,23 +14,19 @@ class Startup {
         this.IApp.Server.on("listening", this.Listing);
         Startup.Self = this;
     }
-
-    public Start(): void {
+    Start() {
         this.IApp.Init();
     }
-    private OnError(): void {
+    OnError() {
         console.log("on error");
     }
-
-    private Listing(): void {
+    Listing() {
         console.log("listening on port " + Startup.Self.GetPort());
     }
-
-    private GetPort(): number {
+    GetPort() {
         return parseInt(process.env.port) || 5858;
     }
 }
-
-const app = new Startup(new ChatApp());
+const app = new Startup(new ChatApp_1.ChatApp());
 app.Start();
 exports = app;

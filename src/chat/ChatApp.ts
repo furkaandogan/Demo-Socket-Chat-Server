@@ -4,53 +4,51 @@ import * as socket from "socket.io";
 import { IApp } from "../IApp";
 import { Typing } from "./models/Typing";
 import { Client } from "./models/Client";
+import { SendingMessage } from "./models/SendingMessage";
+import { Message } from "./models/Message";
+
+// var _self: ChatApp = undefined;
 
 export class ChatApp implements IApp {
 
-    Server: http.Server;//express.Application;
-    Socket: SocketIO.Server;
-    // Port: number;
+    private static Self: ChatApp;
+    public Server: http.Server;
+    public SocketServer: SocketIO.Server;
+    public Socket: SocketIO.Socket;
+
+    private Users:Array<Client>;
 
     constructor() {
-        this.Init();
+
     }
 
     Init(): void {
-        // var app = express();
-        // app.get("/", function (req, res) {
-        //     res.write("chat app");
-        //     res.end();
-        // });
-        this.Server = http.createServer();
-        this.Socket = socket(this.Server);
-        this.Server.listen(this.GetPort());
-        this.Server.on("error", this.OnError);
-        this.Server.on("listening", this.Listing);
-        this.Socket.on("connection", this.Connect);
+        this.Users=new Array<Client>();
+        this.SocketServer = socket(this.Server);
+        this.SocketServer.on("connection", this.Connect);
+        ChatApp.Self = this;
     }
     OnError(): void {
 
     }
 
-    private GetPort(): number {
-        return parseInt(process.env.port) || 5858;
-    }
     private Connect(socket: SocketIO.Socket): void {
-        console.log("user connected");
-        socket.on("disconnect", this.Disconnect);
-        socket.on("typing", function (data: Typing) {
-            socket.emit("typing",data);
-        });
+        socket.on("disconnect", ChatApp.Self.Disconnect);
+        socket.on("typing", ChatApp.Self.Typing);
+        socket.on("send", ChatApp.Self.Send);
+        ChatApp.Self.Users.push(new Client(socket.id,0));
+        console.log(ChatApp.Self.Users.length)
     }
-    private Disconnect() {
+    private Disconnect(): void {
         console.log("user disconnected");
     }
-    private Typing(data: Typing) {
+    private Typing(data: Typing): void {
         console.log(data);
+        ChatApp.Self.SocketServer.emit("typing", data);
+        ChatApp.Self.SocketServer.to(data.ToClient.ConnectionId);
     }
+    private Send(data: SendingMessage): void {
+        console.log(data);
 
-    private Listing(): void {
-        console.log("listening on port");
     }
-
 }
