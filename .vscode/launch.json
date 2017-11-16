@@ -13,7 +13,7 @@
             "args": ["${relativeFile}"],
             "sourceMaps": true,
             "cwd": "${workspaceRoot}",
-            "protocol": "inspector"
+            "protocol": "auto"
         },
         {
             "type": "node",

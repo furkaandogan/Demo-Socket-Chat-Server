@@ -9,7 +9,7 @@
     "socket.io": "^2.0.4"
   },
   "scripts": {
-    "start": "node --debug=5859 ./Startup.js",
+    "start": "node ./Startup.js",
     "test": "echo 'No Error' && exit(1)"
   },
   "repository": {

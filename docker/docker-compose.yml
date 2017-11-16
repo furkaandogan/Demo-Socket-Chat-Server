@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3'
 services:
   server:
     container_name: dh-chat-server
@@ -7,12 +7,20 @@ services:
     build:
       context: .
       dockerfile: dh-chat.dockerfile
+    deploy:
+      mode: replicated
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        max_attempts: 2
+        delay: 2ms
     ports:
       - 5858:5858
       - 5859:5859
     depends_on: 
-      redis:
-        condition: service_healthy
+      - redis
+      # redis:
+      #   condition: service_healthy
   redis:
     container_name: dh-chat-server-redis
     image: redis:3.2.11-alpine #dh-redis:alpine 

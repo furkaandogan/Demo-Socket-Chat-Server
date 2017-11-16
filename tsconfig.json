@@ -6,7 +6,7 @@
     "mapRoot": "./src",
     "sourceMap": true,
     "sourceRoot": "./src",
-    "watch": true
+    "watch": false
   },
   "include": [
     "./src/**/*.ts"
