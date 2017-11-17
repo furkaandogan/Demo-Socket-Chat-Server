@@ -41,7 +41,6 @@ export class ChatApp implements IApp {
         socket.on("set-client", ChatApp.Self.SetClient);
         socket.on("join-room", ChatApp.Self.JoinRoom);
         socket.on("disconnect-room", ChatApp.Self.DisconnectRoom);
-        socket.emit("set-client", socket.id);
     }
     private Disconnect(): void {
         console.log("user disconnected");
@@ -51,7 +50,10 @@ export class ChatApp implements IApp {
         console.log("room key=" + room.ToKey() + "member Id=" + data.FromClient.Id + " connetion Id=" + this.id);
         ChatApp.Self.SocketServer.to(room.ToKey()).emit("typing", {
             Member: new Client(this.id, data.FromClient.Id, data.FromClient.LoginName),
-            RoomKey: room.ToKey()
+            Room: {
+                Key:room.ToKey(),
+                Id:data.Room.PmId
+            }
         });
     }
     private Send(data: any): void {
