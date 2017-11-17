@@ -49,7 +49,7 @@ class ChatApp {
     }
     Send(data) {
         console.log(data);
-        ChatApp.Self.RedisConnector.mget(data.ToClients, function (err, connections) {
+        ChatApp.Self.GetRedisClient().mget(data.ToClients, function (err, connections) {
             console.log(err);
             console.log(connections);
             var emitData = {
@@ -67,21 +67,21 @@ class ChatApp {
     }
     SetClient(data) {
         console.log("member Id=" + data.Id + " connetion Id=" + this.id);
-        ChatApp.Self.RedisConnector.set(data.Id.toString(), this.id);
+        ChatApp.Self.GetRedisClient().set(data.Id.toString(), this.id);
     }
     // data => pm id
     JoinRoom(data) {
         var room = new Room_1.Room(data);
         console.log("join room key=" + room.ToKey() + " connetion Id=" + this.id);
         this.join(room.ToKey());
-        ChatApp.Self.RedisConnector.rpush(room.ToKey(), this.id);
+        ChatApp.Self.GetRedisClient().rpush(room.ToKey(), this.id);
     }
     // data => pm id
     DisconnectRoom(data) {
         var room = new Room_1.Room(data);
         console.log("disconnect room room key=" + room.ToKey() + " connetion Id=" + this.id);
         this.leave(room.ToKey());
-        ChatApp.Self.RedisConnector.lrem(room.ToKey(), 1, this.id);
+        ChatApp.Self.GetRedisClient().lrem(room.ToKey(), 1, this.id);
     }
 }
 exports.ChatApp = ChatApp;
