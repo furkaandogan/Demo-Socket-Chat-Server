@@ -15,10 +15,15 @@ class ChatApp {
     Init() {
         this.SocketServer = socket(this.Server);
         this.SocketServer.on("connection", this.Connect);
-        this.RedisConnector = Redis.createClient(ChatAppConfig_1.default.RedisConfig);
         ChatApp.Self = this;
     }
     OnError() {
+    }
+    GetRedisClient() {
+        if (this.RedisConnector == null) {
+            this.RedisConnector = Redis.createClient(ChatAppConfig_1.default.RedisConfig);
+        }
+        return this.RedisConnector;
     }
     Connect(socket) {
         socket.on("disconnect", ChatApp.Self.Disconnect);

@@ -27,13 +27,19 @@ export class ChatApp implements IApp {
     Init(): void {
         this.SocketServer = socket(this.Server);
         this.SocketServer.on("connection", this.Connect);
-        this.RedisConnector = Redis.createClient(ChatAppConfig.RedisConfig);
         ChatApp.Self = this;
     }
     OnError(): void {
 
     }
 
+
+    private GetRedisClient(): Redis.RedisClient {
+        if(this.RedisConnector==null){
+            this.RedisConnector = Redis.createClient(ChatAppConfig.RedisConfig);
+        }
+        return this.RedisConnector;
+    }
     private Connect(socket: SocketIO.Socket): void {
         socket.on("disconnect", ChatApp.Self.Disconnect);
         socket.on("typing", ChatApp.Self.Typing);
@@ -51,14 +57,14 @@ export class ChatApp implements IApp {
         ChatApp.Self.SocketServer.to(room.ToKey()).emit("typing", {
             Member: new Client(this.id, data.FromClient.Id, data.FromClient.LoginName),
             Room: {
-                Key:room.ToKey(),
-                Id:data.Room.PmId
+                Key: room.ToKey(),
+                Id: data.Room.PmId
             }
         });
     }
     private Send(data: any): void {
         console.log(data);
-        ChatApp.Self.RedisConnector.mget(data.ToClients, function (err,connections) {
+        ChatApp.Self.RedisConnector.mget(data.ToClients, function (err, connections) {
             console.log(err);
             console.log(connections);
             var emitData = {
