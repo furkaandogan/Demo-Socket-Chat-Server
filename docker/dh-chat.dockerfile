@@ -1,4 +1,5 @@
-FROM node:6.12.0-alpine
+FROM node:6.12.0 
+#-alpine
 
 WORKDIR /usr/dhchat 
 
@@ -6,7 +7,7 @@ ENV path /linux
 
 COPY  $path .
 
-RUN chmod +x ./scripts/start.sh
+#RUN sudo chmod +x ./scripts/start.sh
 
 RUN npm install 
 
