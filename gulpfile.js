@@ -19,7 +19,7 @@ gulp.task("linux-cli", function () {
     var script = gulp.src("./linux-cli/**/*.sh")
         .pipe(gulp.dest("./publish/linux/scripts"));
     var makefile = gulp.src("./linux-cli/Makefile")
-        .pipe(gulp.dest("./publish/linux"));
+        .pipe(gulp.dest("./publish/"));
     var docker = gulp.src("./docker/*")
         .pipe(gulp.dest("./publish/"));
     return merge(script, makefile, docker);
