@@ -1,3 +1,4 @@
+import * as Express from "express";
 import * as http from "http";
 import * as socket from "socket.io";
 import * as SocketRedis from "socket.io-redis";
@@ -20,7 +21,7 @@ export class ChatApp implements IApp {
 
     private static Self: ChatApp;
     private RedisConnector: Redis.RedisClient;
-    public Server: http.Server;
+    public Server: Express.Application; //http.Server;
     public SocketServer: SocketIO.Server;
 
     constructor() {
@@ -53,7 +54,6 @@ export class ChatApp implements IApp {
         socket.on("set-client", ChatApp.Self.SetClient);
         socket.on("join-room", ChatApp.Self.JoinRoom);
         socket.on("disconnect-room", ChatApp.Self.DisconnectRoom);
-        socket.emit("connection",socket);
     }
     private Disconnect(): void {
         console.log("user disconnected "+this.id);
