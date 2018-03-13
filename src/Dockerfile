@@ -1,18 +1,16 @@
-FROM node:6.12.0 AS build-env
+FROM node:6-slim AS build-env
 
 WORKDIR /app
 
 COPY  . .
 
-RUN npm install --only=dev 
+RUN npm install
 RUN npm install gulp -g
 RUN gulp build
 
-FROM node:6.12.0
+FROM node:6-slim
 
 WORKDIR /app
-
-RUN npm install
 
 COPY --from=build-env /app .
 
