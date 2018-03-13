@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY  . .
 
-RUN npm install --only=dev -g
+RUN npm install -g
 RUN npm install gulp -g
 RUN gulp build
 
