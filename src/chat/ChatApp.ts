@@ -1,15 +1,21 @@
-import * as express from "express";
+// import * as express from "express";
 import * as http from "http";
 import * as socket from "socket.io";
+import * as SocketRedis from "socket.io-redis";
+import { promisify } from "util";
+import * as Promise from "bluebird";
 import * as Redis from "redis";
 import ChatAppConfig from "./ChatAppConfig";
 import { IApp } from "../IApp";
-// import { Typing } from "./models/Typing";
 import { Client } from "./models/Client";
+// import { Typing } from "./models/Typing";
 // import { SendingMessage } from "./models/SendingMessage";
 // import { Message } from "./models/Message";
 import { Room } from "./models/Room";
 import { json } from "body-parser";
+
+Promise.promisifyAll(Redis.RedisClient.prototype);
+Promise.promisifyAll(Redis.Multi.prototype);
 
 // var _self: ChatApp = undefined;
 
@@ -26,13 +32,13 @@ export class ChatApp implements IApp {
 
     Init(): void {
         this.SocketServer = socket(this.Server);
+        this.SocketServer.adapter(new SocketRedis(ChatAppConfig.RedisConfig));
         this.SocketServer.on("connection", this.Connect);
         ChatApp.Self = this;
     }
     OnError(): void {
 
     }
-
 
     private GetRedisClient(): Redis.RedisClient {
         if(this.RedisConnector==null){
@@ -44,6 +50,7 @@ export class ChatApp implements IApp {
         socket.on("disconnect", ChatApp.Self.Disconnect);
         socket.on("typing", ChatApp.Self.Typing);
         socket.on("send", ChatApp.Self.Send);
+        socket.on("seen", ChatApp.Self.Seen);
         socket.on("set-client", ChatApp.Self.SetClient);
         socket.on("join-room", ChatApp.Self.JoinRoom);
         socket.on("disconnect-room", ChatApp.Self.DisconnectRoom);
@@ -52,7 +59,7 @@ export class ChatApp implements IApp {
         console.log("user disconnected");
     }
     private Typing(data: any): void {
-        var room = new Room(data.Room.PmId);
+        /*var room = new Room(data.Room.PmId);
         console.log("room key=" + room.ToKey() + "member Id=" + data.FromClient.Id + " connetion Id=" + this.id);
         ChatApp.Self.SocketServer.to(room.ToKey()).emit("typing", {
             Member: new Client(this.id, data.FromClient.Id, data.FromClient.LoginName),
@@ -60,30 +67,107 @@ export class ChatApp implements IApp {
                 Key: room.ToKey(),
                 Id: data.Room.PmId
             }
+        });*/
+
+        ChatApp.Self.GetRedisClient().mget(data.ToClients, function (err, connections) {
+            if(data.secureKey == undefined){
+                return;
+            }
+            ChatApp.Self.GetRedisClient().get(data.secureKey, function (err2, secureKeyUserId) {
+                if(err2){
+                    return;
+                }
+                if(data.FromClient.Id != secureKeyUserId){
+                    return;
+                }
+            
+                var emitData = {
+                    Member: data.Member,
+                    FromClient : data.FromClient,
+                    PmId:data.PmId
+                };
+                connections.forEach(connectionId => {
+                    if (connectionId != this.id) {
+                        ChatApp.Self.SocketServer.to(connectionId).emit("typing", emitData);
+                    }
+                }); 
+            });
         });
     }
     private Send(data: any): void {
-        console.log(data);
-        ChatApp.Self.GetRedisClient().mget(data.ToClients, function (err, connections) {
-            console.log(err);
-            console.log(connections);
-            var emitData = {
-                Member: data.Member,
-                Body: data.Body,
-                DateCreatedWellFormed: data.DateCreatedWellFormed,
-                Html: data.Html
-            };
-            connections.forEach(connectionId => {
-                if (connectionId != this.id) {
-                    ChatApp.Self.SocketServer.to(connectionId).emit("send", emitData);
+
+       
+         ChatApp.Self.GetRedisClient().mget(data.ToClients, function (err, connections) {
+            if(data.secureKey == undefined){
+                return;
+            }
+            ChatApp.Self.GetRedisClient().get(data.secureKey, function (err2, secureKeyUserId) {
+                if(err2){
+                    return;
                 }
+                if(data.FromClient.Id != secureKeyUserId){
+                    return;
+                }
+
+                var emitData = {
+                    Member: data.Member,
+                    Body: data.Body,
+                    DateCreatedWellFormed: data.DateCreatedWellFormed,
+                    Html: data.Html,
+                    FromClient : data.FromClient,
+                    PmId:data.PmId
+                };
+                console.log(data);
+                connections.forEach(connectionId => {
+                    if (connectionId != this.id) {
+                        ChatApp.Self.SocketServer.to(connectionId).emit("send", emitData);
+                    }
+                });
             });
         });
     }
 
+    private Seen(data: any): void {
+        console.log(data);
+        ChatApp.Self.GetRedisClient().mget(data.ToClients, function (err, connections) {
+           if(data.secureKey == undefined){
+               return;
+           }
+           ChatApp.Self.GetRedisClient().get(data.secureKey, function (err2, secureKeyUserId) {
+               if(err2){
+                   console.log(err2);
+                   return;
+               }
+               if(data.FromClient.Id != secureKeyUserId){
+                   return;
+               }
+               var emitData = {
+                   FromClient : data.FromClient,
+                   PmId:data.PmId
+               };
+               connections.forEach(connectionId => {
+                   if (connectionId != this.id) {
+                       console.log(connectionId+" yolla " +emitData.PmId);
+                       ChatApp.Self.SocketServer.to(connectionId).emit("seen", emitData);
+                   }
+               });
+           });
+       });
+   }
+
     private SetClient(data: any): void {
         console.log("member Id=" + data.Id + " connetion Id=" + this.id);
-        ChatApp.Self.GetRedisClient().set(data.Id.toString(), this.id);
+        var connectionId = this.id;
+        console.log(data);
+        ChatApp.Self.GetRedisClient().get(data.secureKey, function (err2, secureKeyUserId) {
+            if(err2){
+                return;
+            }
+            if(data.Id != secureKeyUserId){
+                return;
+            }
+            ChatApp.Self.GetRedisClient().set(data.Id.toString(), connectionId);
+        });
     }
 
     // data => pm id

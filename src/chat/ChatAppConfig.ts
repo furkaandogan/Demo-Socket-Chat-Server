@@ -5,8 +5,9 @@ class ChatAppConfig implements IAppConfig {
 
     constructor() {
         this.RedisConfig = {
-            host: "redis",
-            port: 6379
+            host: "46.45.154.93",
+            port: 6379,
+            password : ';mgeEcVyLaTBLmrKhNjs7qQXQ?7j;{7M2ufty2eQ'
         };
     }
 }

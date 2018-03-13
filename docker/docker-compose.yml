@@ -2,33 +2,28 @@ version: '3'
 services:
   server:
     container_name: dh-chat-server
-    #command: nodemon --debug=5859
     image: dh-chat:test
     build:
-      context: .
-      dockerfile: dh-chat.dockerfile
+      context: ../src/
+      dockerfile: Dockerfile
+    environment:
+      - port=80
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
       restart_policy:
         condition: on-failure
         max_attempts: 2
         delay: 2ms
     ports:
-      - 5858:5858
-      - 5859:5859
+      - 5858:80
     depends_on: 
       - redis
       # redis:
       #   condition: service_healthy
   redis:
     container_name: dh-chat-server-redis
-    image: redis:3.2.11-alpine #dh-redis:alpine 
-    # build:
-    #   context: .
-    #   dockerfile: redis.alpine.dockerfile
-    ports:
-      - 6379:6379
+    image: redis:3.2.11-alpine
     healthcheck:
       test: "exit 0"
       interval: 3s
