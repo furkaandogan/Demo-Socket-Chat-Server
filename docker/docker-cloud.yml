@@ -9,7 +9,7 @@ services:
       - port=80
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 5
       restart_policy:
         condition: on-failure
         max_attempts: 2
