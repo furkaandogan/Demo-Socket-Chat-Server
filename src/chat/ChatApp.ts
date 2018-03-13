@@ -115,7 +115,6 @@ export class ChatApp implements IApp {
                     FromClient : data.FromClient,
                     PmId:data.PmId
                 };
-                console.log(data);
                 connections.forEach(connectionId => {
                     if (connectionId != this.id) {
                         ChatApp.Self.SocketServer.to(connectionId).emit("send", emitData);
@@ -126,14 +125,12 @@ export class ChatApp implements IApp {
     }
 
     private Seen(data: any): void {
-        console.log(data);
         ChatApp.Self.GetRedisClient().mget(data.ToClients, function (err, connections) {
            if(data.secureKey == undefined){
                return;
            }
            ChatApp.Self.GetRedisClient().get(data.secureKey, function (err2, secureKeyUserId) {
                if(err2){
-                   console.log(err2);
                    return;
                }
                if(data.FromClient.Id != secureKeyUserId){
@@ -145,7 +142,6 @@ export class ChatApp implements IApp {
                };
                connections.forEach(connectionId => {
                    if (connectionId != this.id) {
-                       console.log(connectionId+" yolla " +emitData.PmId);
                        ChatApp.Self.SocketServer.to(connectionId).emit("seen", emitData);
                    }
                });
@@ -154,7 +150,6 @@ export class ChatApp implements IApp {
    }
 
     private SetClient(data: any): void {
-        console.log("member Id=" + data.Id + " connetion Id=" + this.id);
         var connectionId = this.id;
         ChatApp.Self.GetRedisClient().get(data.secureKey, function (err2, secureKeyUserId) {
             if(err2){
@@ -170,7 +165,6 @@ export class ChatApp implements IApp {
     // data => pm id
     private JoinRoom(data: number): void {
         var room = new Room(data);
-        console.log("join room key=" + room.ToKey() + " connetion Id=" + this.id);
         this.join(room.ToKey());
         ChatApp.Self.GetRedisClient().rpush(room.ToKey(), this.id);
     }
@@ -178,7 +172,6 @@ export class ChatApp implements IApp {
     // data => pm id
     private DisconnectRoom(data: number): void {
         var room = new Room(data);
-        console.log("disconnect room room key=" + room.ToKey() + " connetion Id=" + this.id);
         this.leave(room.ToKey());
         ChatApp.Self.GetRedisClient().lrem(room.ToKey(), 1, this.id);
     }

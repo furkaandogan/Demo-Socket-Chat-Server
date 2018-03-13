@@ -1,3 +1,5 @@
+import * as Cluster from "cluster";
+import * as OS from "os";
 import * as http from "http";
 import { IApp } from "./IApp";
 import { ChatApp } from "./chat/ChatApp";
@@ -85,7 +87,18 @@ class Startup {
         return parseInt(process.env.port) || 5858;
     }
 }
-
-const app = new Startup(new ChatApp());
-app.Start();
-exports = app;
+const cpus=OS.cpus().length;
+if(Cluster.isMaster){
+    for (let i = 0; i < cpus; i++) {
+        Cluster.fork();
+    }
+    
+    Cluster.on('exit', (worker, code, signal) => {
+        console.log(`worker ${worker.process.pid} died`);
+    });
+}else{
+    const app = new Startup(new ChatApp());
+    app.Start();
+    exports = app;
+    console.log(`Worker ${process.pid} started`);
+}

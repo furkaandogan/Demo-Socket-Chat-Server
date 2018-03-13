@@ -1,4 +1,4 @@
-FROM node:6-slim AS build-env
+FROM node:9.8.0-slim AS build-env
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ RUN npm install
 RUN npm install gulp -g
 RUN gulp build
 
-FROM node:6-slim
+FROM node:9.8.0-slim
 
 WORKDIR /app
 
