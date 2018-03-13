@@ -53,6 +53,7 @@ export class ChatApp implements IApp {
         socket.on("set-client", ChatApp.Self.SetClient);
         socket.on("join-room", ChatApp.Self.JoinRoom);
         socket.on("disconnect-room", ChatApp.Self.DisconnectRoom);
+        socket.emit("connection",socket);
     }
     private Disconnect(): void {
         console.log("user disconnected "+this.id);
