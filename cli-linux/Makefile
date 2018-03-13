@@ -2,7 +2,7 @@ init:
 	make build
 	make deploy
 build:
-	docker build -t hub.donanimhaber.com:5000/dh-chat-socket-server:1.0-beta -f ../src/Dockerfile ../src/
+	docker build --no-cache -t hub.donanimhaber.com:5000/dh-chat-socket-server:1.0-beta -f ../src/Dockerfile ../src/
 	docker tag hub.donanimhaber.com:5000/dh-chat-socket-server:1.0-beta hub.donanimhaber.com:5000/dh-chat-socket-server:1.0-beta
 	docker push hub.donanimhaber.com:5000/dh-chat-socket-server:1.0-beta
 deploy:
