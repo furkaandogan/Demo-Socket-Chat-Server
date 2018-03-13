@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY  . .
 
-RUN npm install
+RUN npm install --only=dev -g
 RUN npm install gulp -g
 RUN gulp build
 
@@ -13,6 +13,8 @@ FROM node:9.8.0-slim
 WORKDIR /app
 
 COPY --from=build-env /app .
+
+RUN npm install --only=prod
 
 EXPOSE 80
 

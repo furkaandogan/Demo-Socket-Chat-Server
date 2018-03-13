@@ -55,7 +55,7 @@ export class ChatApp implements IApp {
         socket.on("disconnect-room", ChatApp.Self.DisconnectRoom);
     }
     private Disconnect(): void {
-        console.log("user disconnected");
+        console.log("user disconnected "+this.id);
     }
     private Typing(data: any): void {
         /*var room = new Room(data.Room.PmId);
