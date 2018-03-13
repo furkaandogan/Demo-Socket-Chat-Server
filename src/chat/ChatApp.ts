@@ -45,12 +45,13 @@ export class ChatApp implements IApp {
         return this.RedisConnector;
     }
     private Connect(socket: SocketIO.Socket): void {
-        socket.on("disconnect", this.Disconnect);
-        socket.on("typing", this.Typing);
-        socket.on("send", this.Send);
-        socket.on("seen", this.Seen);
-        socket.on("set-client", this.SetClient);
-        socket.on("join-room", this.JoinRoom);
+        console.log("connected "+socket.id);
+        socket.on("disconnect", ChatApp.Self.Disconnect);
+        socket.on("typing", ChatApp.Self.Typing);
+        socket.on("send", ChatApp.Self.Send);
+        socket.on("seen", ChatApp.Self.Seen);
+        socket.on("set-client", ChatApp.Self.SetClient);
+        socket.on("join-room", ChatApp.Self.JoinRoom);
         socket.on("disconnect-room", ChatApp.Self.DisconnectRoom);
     }
     private Disconnect(): void {
