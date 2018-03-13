@@ -1,4 +1,3 @@
-// import * as express from "express";
 import * as http from "http";
 import * as socket from "socket.io";
 import * as SocketRedis from "socket.io-redis";
@@ -17,8 +16,6 @@ import { json } from "body-parser";
 Promise.promisifyAll(Redis.RedisClient.prototype);
 Promise.promisifyAll(Redis.Multi.prototype);
 
-// var _self: ChatApp = undefined;
-
 export class ChatApp implements IApp {
 
     private static Self: ChatApp;
@@ -33,9 +30,10 @@ export class ChatApp implements IApp {
     Init(): void {
         this.SocketServer = socket(this.Server);
         this.SocketServer.adapter(new SocketRedis(ChatAppConfig.RedisConfig));
-        this.SocketServer.on("connection", this.Connect);
+        this.SocketServer.on("connection", this.Connect.bind(this));
         ChatApp.Self = this;
     }
+    
     OnError(): void {
 
     }
@@ -47,12 +45,12 @@ export class ChatApp implements IApp {
         return this.RedisConnector;
     }
     private Connect(socket: SocketIO.Socket): void {
-        socket.on("disconnect", ChatApp.Self.Disconnect);
-        socket.on("typing", ChatApp.Self.Typing);
-        socket.on("send", ChatApp.Self.Send);
-        socket.on("seen", ChatApp.Self.Seen);
-        socket.on("set-client", ChatApp.Self.SetClient);
-        socket.on("join-room", ChatApp.Self.JoinRoom);
+        socket.on("disconnect", this.Disconnect);
+        socket.on("typing", this.Typing);
+        socket.on("send", this.Send);
+        socket.on("seen", this.Seen);
+        socket.on("set-client", this.SetClient);
+        socket.on("join-room", this.JoinRoom);
         socket.on("disconnect-room", ChatApp.Self.DisconnectRoom);
     }
     private Disconnect(): void {
@@ -158,7 +156,6 @@ export class ChatApp implements IApp {
     private SetClient(data: any): void {
         console.log("member Id=" + data.Id + " connetion Id=" + this.id);
         var connectionId = this.id;
-        console.log(data);
         ChatApp.Self.GetRedisClient().get(data.secureKey, function (err2, secureKeyUserId) {
             if(err2){
                 return;

@@ -1,4 +1,3 @@
-// import * as express from "express";
 import * as http from "http";
 import { IApp } from "./IApp";
 import { ChatApp } from "./chat/ChatApp";
@@ -8,7 +7,6 @@ import * as io from 'socket.io-client';
 class Startup {
     private static Self: Startup;
     private IApp: IApp;
-    // private ExpressApp: Express.Application;
 
     constructor(app: IApp) {
         this.IApp = app;
