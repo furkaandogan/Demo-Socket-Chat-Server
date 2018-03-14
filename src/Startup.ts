@@ -52,7 +52,7 @@ class Startup {
             }      
 
 
-            res.write("dh chat app"+req.url);
+            res.write(`dh chat app ${req.url}`);
             res.end();
         });
         this.IApp.Server.listen(this.GetPort());
@@ -80,28 +80,28 @@ class Startup {
     }
 
     private Listing(): void {
-        console.log("listening on port " + Startup.Self.GetPort());
+        console.log(`listening on port ${Startup.Self.GetPort()}`);
     }
 
     private GetPort(): number {
         return parseInt(process.env.port) || 5858;
     }
 }
-// const cpus=OS.cpus().length;
-// if(Cluster.isMaster){
-//     for (let i = 0; i < cpus; i++) {
-//         Cluster.fork();
-//     }
+const cpus=OS.cpus().length;
+if(Cluster.isMaster){
+    for (let i = 0; i < cpus; i++) {
+        Cluster.fork();
+    }
     
-//     Cluster.on('exit', (worker, code, signal) => {
-//         console.log(`worker ${worker.process.pid} died`);
-//     });
-// }else{
-//     const app = new Startup(new ChatApp());
-//     app.Start();
-//     exports = app;
-//     console.log(`Worker ${process.pid} started`);
-// }
-const app = new Startup(new ChatApp());
-app.Start();
-exports = app;
+    Cluster.on('exit', (worker, code, signal) => {
+        console.log(`worker ${worker.process.pid} died`);
+    });
+}else{
+    const app = new Startup(new ChatApp());
+    app.Start();
+    exports = app;
+    console.log(`Worker ${process.pid} started`);
+}
+// const app = new Startup(new ChatApp());
+// app.Start();
+// exports = app;

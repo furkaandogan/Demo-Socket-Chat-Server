@@ -21,7 +21,7 @@ export class ChatApp implements IApp {
 
     private static Self: ChatApp;
     private RedisConnector: Redis.RedisClient;
-    public Server: Express.Application; //http.Server;
+    public Server: http.Server;
     public SocketServer: SocketIO.Server;
 
     constructor() {
@@ -46,7 +46,7 @@ export class ChatApp implements IApp {
         return this.RedisConnector;
     }
     private Connect(socket: SocketIO.Socket): void {
-        console.log("connected "+socket.id);
+        console.log(`connected pid: ${process.pid} sockerId: ${socket.id}`);
         socket.on("disconnect", ChatApp.Self.Disconnect);
         socket.on("typing", ChatApp.Self.Typing);
         socket.on("send", ChatApp.Self.Send);
@@ -56,7 +56,7 @@ export class ChatApp implements IApp {
         socket.on("disconnect-room", ChatApp.Self.DisconnectRoom);
     }
     private Disconnect(): void {
-        console.log("user disconnected "+this.id);
+        console.log(`user disconnected  sockerId: ${this.id}`);
     }
     private Typing(data: any): void {
         /*var room = new Room(data.Room.PmId);
