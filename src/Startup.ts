@@ -61,9 +61,6 @@ class Startup {
              });      
         });
         
-        var cookieParser = require("cookie-parser");
-
-        this.IApp.Express.use(cookieParser);
 
         this.IApp.Express.Server = require('http').Server(this.IApp.Express);
        // this.IApp.Express.Server.listen(this.GetPort());
