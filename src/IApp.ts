@@ -2,7 +2,9 @@ import * as http from "http";
 
 export interface IApp {
 
-    Server: http.Server;
+    Express;   
+    SocketServer;
+    SocketSession;
     Init(): void;
     OnError(): void;
 }
