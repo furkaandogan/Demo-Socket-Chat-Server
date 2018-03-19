@@ -60,22 +60,12 @@ class Startup {
                 ok: 'ok'
              });      
         });
-                
-        var  session = require("express-session")({
-            secret: "my-secret",
-            resave: true,
-            saveUninitialized: true
-          }),
-          sharedsession = require("express-socket.io-session");
         
-          var cookieParser = require("cookie-parser");
+        var cookieParser = require("cookie-parser");
 
-        this.IApp.Express.use(session);
         this.IApp.Express.use(cookieParser);
 
         this.IApp.Express.Server = require('http').Server(this.IApp.Express);
-
-    
        // this.IApp.Express.Server.listen(this.GetPort());
 
         this.IApp.Express.use(router);
@@ -87,9 +77,6 @@ class Startup {
         this.IApp.SocketServer = socket(this.IApp.Express.Server);
         var ChatAppConfig = require('./chat/ChatAppConfig');
         this.IApp.SocketServer.adapter(redisAdapter(ChatAppConfig.RedisConfig));
-        this.IApp.SocketServer.use(sharedsession(session, {
-            autoSave:true
-        }));
         Startup.Self = this;
     }
     public makeid():String {
