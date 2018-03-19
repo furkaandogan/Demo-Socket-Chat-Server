@@ -8,6 +8,8 @@ import * as url from "url";
 import * as io from 'socket.io-client';
 import * as express from 'express'
 import * as socket from "socket.io";
+import * as SocketRedis from "socket.io-redis";
+import ChatAppConfig from "./chat/ChatAppConfig";
 
 class Startup {
     private static Self: Startup;
@@ -69,11 +71,10 @@ class Startup {
         this.IApp.Express.on("error", this.OnError);
         this.IApp.Express.on("listening", this.Listing);
         
-        var redisAdapter = require('socket.io-redis');
+        // var redisAdapter = require('socket.io-redis');
 
         this.IApp.SocketServer = socket(this.IApp.Express.Server);
-        var ChatAppConfig = require('./chat/ChatAppConfig');
-        this.IApp.SocketServer.adapter(redisAdapter(ChatAppConfig.RedisConfig));
+        this.IApp.SocketServer.adapter(SocketRedis(ChatAppConfig.RedisConfig));
         Startup.Self = this;
     }
     public makeid():String {
